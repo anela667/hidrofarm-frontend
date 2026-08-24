@@ -1,5 +1,4 @@
-// Sesuaikan kalau port/URL backend kamu berbeda (lihat PORT di be-hidrofarm/.env)
-export const API_URL = "http://localhost:5000";
+export const API_URL = "https://api.start-hidrofarm.site";
 
 export function saveSession(token, user) {
   localStorage.setItem("token", token);
@@ -24,12 +23,6 @@ export function logout() {
   localStorage.removeItem("user");
 }
 
-// Backend mengirim tanggal (kolom DATE seperti started_at) sebagai string
-// ISO datetime UTC penuh (mis. "2026-08-18T17:00:00.000Z"), akibat konversi
-// timezone otomatis JavaScript saat serialisasi JSON -- tanggal aslinya di
-// database cuma "2026-08-19" tanpa jam. formatTanggal() balikin ke tanggal
-// lokal yang benar (pakai method lokal, BUKAN getUTCDate/dst, supaya
-// tanggalnya gak kegeser mundur 1 hari lagi).
 export function formatTanggal(rawDate) {
   if (!rawDate) return "-";
   const d = new Date(rawDate);
