@@ -40,8 +40,8 @@ export default function RencanaPerkebunan() {
   const lanjutKeChecklist = () => {
     setError("");
 
-    if (!idPlant || !count) {
-      setError("Pilih jenis tanaman dan isi jumlah tanaman dulu ya.");
+    if (!idPlant || !metode || !count) {
+      setError("silahkan isi terlebih dahulu jenis tanaman, metode dan jumlah");
       return;
     }
 
@@ -58,8 +58,6 @@ export default function RencanaPerkebunan() {
     setSaving(true);
     try {
       const res = await planApi.create(user.id, idPlant, Number(count));
-      // Kirim data plan yang baru dibuat lewat state navigasi, supaya
-      // halaman Farm bisa langsung menampilkannya tanpa nunggu fetch ulang.
       navigate("/Farm", { state: { newPlan: res.data } });
       return;
     } catch (err) {
