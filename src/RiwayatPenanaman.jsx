@@ -22,20 +22,19 @@ export default function RiwayatPenanaman() {
     if (!user) return;
     setLoading(true);
     setError("");
-    try {
-      const [logsRes, plansRes] = await Promise.all([
-        logApi.getByUserId(user.id),
-        planApi.getByUserId(user.id),
-      ]);
-      setRiwayat(logsRes.data || []);
-      setPlans(plansRes.data || []);
-    } catch (err) {
-      setError(err.message || "Gagal memuat riwayat.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  try {
+    const [logsRes, plansRes] = await Promise.all([
+      logApi.getByUserId(user.id),
+      planApi.getByUserId(user.id),
+    ]);
+    setRiwayat(logsRes.data || []);
+    setPlans(plansRes.data || []);
+  } catch (err) {
+    if (!silent) setError(err.message || "Gagal memuat riwayat.");
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     loadData();
   }, []);
@@ -44,28 +43,38 @@ export default function RiwayatPenanaman() {
     setModalError("");
 
     if (!planId || succes === "" || fail === "") {
-      setModalError("Lengkapi rencana, jumlah berhasil, dan gagal dulu ya.");
+      setModalError("Lengkapi rencana, jumlah berhasil, dan jumlah gagal terlebih dahulu.");
       return;
     }
 
     const selectedPlan = plans.find((p) => p.id === Number(planId));
     const total = Number(succes) + Number(fail);
-
     if (selectedPlan && total > selectedPlan.count) {
       setModalError(
-        `Total berhasil + gagal (${total}) tidak boleh melebihi jumlah tanaman di rencana ini (${selectedPlan.count}).`
+        `Total berhasil dan gagal (${total}) tidak boleh melebihi jumlah tanaman di rencana ini (${selectedPlan.count}).`
       );
       return;
     }
 
     setSaving(true);
     try {
-      await logApi.create(user.id, Number(planId), Number(succes), Number(fail));
+      const res = await logApi.create(user.id, Number(planId), Number(succes), Number(fail));
+      setRiwayat((current) => [
+        {
+          id: res.data?.id ?? `temp-${Date.now()}`,
+          started_at: selectedPlan?.started_at,
+          name: selectedPlan?.plant?.name,
+          succes: Number(succes),
+          fail: Number(fail),
+        },
+        ...current,
+      ]);
+
       setShowModal(false);
       setPlanId("");
       setSucces("");
       setFail("");
-      await loadData();
+      loadData(true); 
     } catch (err) {
       setModalError(err.message || "Gagal menyimpan riwayat.");
     } finally {
