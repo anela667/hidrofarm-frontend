@@ -55,6 +55,10 @@ export default function RencanaPerkebunan() {
 
   const mulaiBerkebun = async () => {
     setError("");
+    if (!semuaSudahDicentang) {
+      setError("silahkan lengkapi terlebih dahulu");
+      return;
+    }
     setSaving(true);
     try {
       const res = await planApi.create(user.id, idPlant, Number(count));
@@ -69,6 +73,7 @@ export default function RencanaPerkebunan() {
 
   const selectedPlant = plants.find((p) => p.id === idPlant);
   const checklist = selectedPlant ? buatChecklist(selectedPlant.name, count) : [];
+  const semuaSudahDicentang = checklist.length > 0 && checklist.every((_, index) => checkedItems[index]);
 
   const handleBack = () => {
     if (step === "checklist") {
