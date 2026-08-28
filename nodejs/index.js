@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
-const siteDir = path.join(currentDir, "..", "public_html");
+const siteDir = path.join(currentDir, "..", "dist");
 const port = process.env.PORT || 3000;
 
 const mimeTypes = {
