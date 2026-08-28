@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
-const distDir = path.join(currentDir, "..", "dist");
+const siteDir = path.join(currentDir, "..", "public_html");
 const port = process.env.PORT || 3000;
 
 const mimeTypes = {
@@ -23,23 +23,28 @@ const mimeTypes = {
 };
 
 const server = http.createServer((request, response) => {
-  const requestedPath = decodeURIComponent(request.url.split("?")[0]);
-  let filePath = path.join(distDir, requestedPath === "/" ? "index.html" : requestedPath);
+  const requestPath = decodeURIComponent(request.url.split("?")[0]);
+  let filePath = path.join(
+    siteDir,
+    requestPath === "/" ? "index.html" : requestPath
+  );
 
-  if (!filePath.startsWith(distDir)) {
+  if (!filePath.startsWith(siteDir)) {
     response.writeHead(403);
     response.end("Forbidden");
     return;
   }
 
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    filePath = path.join(distDir, "index.html");
+    filePath = path.join(siteDir, "index.html");
   }
 
   const extension = path.extname(filePath);
+
   response.writeHead(200, {
     "Content-Type": mimeTypes[extension] || "application/octet-stream"
   });
+
   response.end(fs.readFileSync(filePath));
 });
 
