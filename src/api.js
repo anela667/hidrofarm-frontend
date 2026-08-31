@@ -1,4 +1,4 @@
-export const API_URL = "https://api.start-hidrofarm.site";
+export const VITE_API_URL= "https://api.start-hidrofarm.site";
 
 export function saveSession(token, user) {
   localStorage.setItem("token", token);
